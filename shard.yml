@@ -1,0 +1,18 @@
+name: renderer
+version: 0.1.0
+
+authors:
+  - Marc Heiligers <marc@eternal.co.za>
+
+targets:
+  renderer:
+    main: src/renderer.cr
+
+crystal: '>= 1.10.1'
+
+license: MIT
+
+dependencies:
+  sdl-crystal-bindings:
+    github: Hadeweka/SDL-Crystal-Bindings
+    branch: main
