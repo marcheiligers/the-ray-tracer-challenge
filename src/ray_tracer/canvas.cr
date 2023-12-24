@@ -12,8 +12,12 @@ module RayTracer
       @pixels[y][x]
     end
 
-    def write_pixel(x, y, color)
+    def write_pixel(x, y, color : Color::COLOR)
       @pixels[y][x] = color
+    end
+
+    def write_pixel(x : Float64, y : Float64, color : Color::COLOR)
+      @pixels[y.round.to_i32][x.round.to_i32] = color
     end
 
     private def to_255(value) : Int32

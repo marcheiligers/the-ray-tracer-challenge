@@ -13,6 +13,66 @@ module RayTracer
 
     IDENTITY_4 = identity(4)
 
+    def self.translation(x, y, z)
+      temp = [x, y, z, 1]
+      data = Array(Array(Float64)).new(4) do |row|
+        Array(Float64).new(4) do |col|
+          if col == 3
+            temp[row].to_f64
+          else
+            row == col ? 1_f64 : 0_f64
+          end
+        end
+      end
+      new(data)
+    end
+
+    def self.scaling(x, y, z)
+      temp = [x, y, z, 1]
+      data = Array(Array(Float64)).new(4) do |row|
+        Array(Float64).new(4) do |col|
+          row == col ? temp[col].to_f64 : 0_f64
+        end
+      end
+      new(data)
+    end
+
+    def self.rotation_x(r)
+      new([
+        [1_f64, 0_f64, 0_f64, 0_f64],
+        [0_f64, Math.cos(r), Math.sin(-r), 0_f64],
+        [0_f64, Math.sin(r), Math.cos(r), 0_f64],
+        [0_f64, 0_f64, 0_f64, 1_f64],
+      ])
+    end
+
+    def self.rotation_y(r)
+      new([
+        [Math.cos(r), 0_f64, Math.sin(r), 0_f64],
+        [0_f64, 1_f64, 0_f64, 0_f64],
+        [Math.sin(r), 0_f64, Math.cos(r), 0_f64],
+        [0_f64, 0_f64, 0_f64, 1_f64],
+      ])
+    end
+
+    def self.rotation_z(r)
+      new([
+        [Math.cos(r), -Math.sin(r), 0_f64, 0_f64],
+        [Math.sin(r), Math.cos(r), 0_f64, 0_f64],
+        [0_f64, 0_f64, 1_f64, 0_f64],
+        [0_f64, 0_f64, 0_f64, 1_f64],
+      ])
+    end
+
+    def self.shearing(x_y, x_z, y_x, y_z, z_x, z_y)
+      new([
+        [1_f64, x_y.to_f64, x_z.to_f64, 0_f64],
+        [y_x.to_f64, 1_f64, y_z.to_f64, 0_f64],
+        [z_x.to_f64, z_y.to_f64, 1_f64, 0_f64],
+        [0_f64, 0_f64, 0_f64, 1_f64],
+      ])
+    end
+
     def initialize(vals : Array(Array(Float64) | Array(Int32)))
       raise "Unequal row lengths" unless vals[1..-1].all? { |r| r.size == vals[0].size }
 
@@ -125,6 +185,31 @@ module RayTracer
           end.to_a
         end.to_a
       )
+    end
+
+    # Fluent transforms
+    def translation(x, y, z)
+      self * self.class.translation(x, y, z)
+    end
+
+    def scaling(x, y, z)
+      self * self.class.scaling(x, y, z)
+    end
+
+    def rotation_x(r)
+      self * self.class.rotation_x(r)
+    end
+
+    def rotation_y(r)
+      self * self.class.rotation_y(r)
+    end
+
+    def rotation_z(r)
+      self * self.class.rotation_z(r)
+    end
+
+    def shearing(x_y, x_z, y_x, y_z, z_x, z_y)
+      self * self.class.shearing(x_y, x_z, y_x, y_z, z_x, z_y)
     end
   end
 end
