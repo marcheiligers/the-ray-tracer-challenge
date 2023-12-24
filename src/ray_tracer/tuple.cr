@@ -3,6 +3,7 @@ module RayTracer
     extend self
 
     alias TUPLE = NamedTuple(x: Float64, y: Float64, z: Float64, w: Float64)
+    ORIGIN = point(0, 0, 0)
 
     def point?(tuple : TUPLE)
       tuple[:w] == 1.0

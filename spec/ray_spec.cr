@@ -120,4 +120,32 @@ describe RayTracer::Ray do
     xs[0].object.should eq(s)
     xs[1].object.should eq(s)
   end
+
+  # Scenario: Translating a ray
+  # Given r ← ray(point(1, 2, 3), vector(0, 1, 0))
+  # And m ← translation(3, 4, 5)
+  # When r2 ← transform(r, m)
+  # Then r2.origin = point(4, 6, 8)
+  # And r2.direction = vector(0, 1, 0)
+  it "translating a ray" do
+    r = RayTracer::Ray.new(RayTracer::Tuple.point(1, 2, 3), RayTracer::Tuple.vector(0, 1, 0))
+    m = RayTracer::Matrix.translation(3, 4, 5)
+    r2 = r.transform(m)
+    r2.origin.should eq(RayTracer::Tuple.point(4, 6, 8))
+    r2.direction.should eq(RayTracer::Tuple.vector(0, 1, 0))
+  end
+
+  # Scenario: Scaling a ray
+  # Given r ← ray(point(1, 2, 3), vector(0, 1, 0))
+  # And m ← scaling(2, 3, 4)
+  # When r2 ← transform(r, m)
+  # Then r2.origin = point(2, 6, 12)
+  # And r2.direction = vector(0, 3, 0)
+  it "scaling a ray" do
+    r = RayTracer::Ray.new(RayTracer::Tuple.point(1, 2, 3), RayTracer::Tuple.vector(0, 1, 0))
+    m = RayTracer::Matrix.scaling(2, 3, 4)
+    r2 = r.transform(m)
+    r2.origin.should eq(RayTracer::Tuple.point(2, 6, 12))
+    r2.direction.should eq(RayTracer::Tuple.vector(0, 3, 0))
+  end
 end
