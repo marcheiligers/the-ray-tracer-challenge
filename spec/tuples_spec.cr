@@ -305,4 +305,29 @@ describe RayTracer::Tuple do
     a.cross(b).should eq(RayTracer::Tuple.vector(-1, 2, -1))
     b.cross(a).should eq(RayTracer::Tuple.vector(1, -2, 1))
   end
+
+  # Scenario: Reflecting a vector approaching at 45°
+  #   Given v ← vector(1, -1, 0)
+  #     And n ← vector(0, 1, 0)
+  #   When r ← reflect(v, n)
+  #   Then r = vector(1, 1, 0)
+  it "reflecting a vector approaching at 45°" do
+    v = RayTracer::Tuple.vector(1, -1, 0)
+    n = RayTracer::Tuple.vector(0, 1, 0)
+    r = v.reflect(n)
+    r.should eq(RayTracer::Tuple.vector(1, 1, 0))
+  end
+
+  # Scenario: Reflecting a vector off a slanted surface
+  #   Given v ← vector(0, -1, 0)
+  #     And n ← vector(√2/2, √2/2, 0)
+  #   When r ← reflect(v, n)
+  #   Then r = vector(1, 0, 0)
+  it "reflecting a vector off a slanted surface" do
+    v = RayTracer::Tuple.vector(0, -1, 0)
+    sq2 = Math.sqrt(2) / 2
+    n = RayTracer::Tuple.vector(sq2, sq2, 0)
+    r = v.reflect(n)
+    r.should be_close(RayTracer::Tuple.vector(1, 0, 0), Spec::DELTA)
+  end
 end

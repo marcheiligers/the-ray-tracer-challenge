@@ -52,4 +52,106 @@ describe RayTracer::Sphere do
     xs = r.intersects(s)
     xs.size.should eq(0)
   end
+
+  # Scenario: The normal on a sphere at a point on the x axis
+  #   Given s ← sphere()
+  #   When n ← normal_at(s, point(1, 0, 0))
+  #   Then n = vector(1, 0, 0)
+  it "the normal on a sphere at a point on the x axis" do
+    s = RayTracer::Sphere.new
+    n = s.normal_at(RayTracer::Tuple.point(1, 0, 0))
+    n.should eq(RayTracer::Tuple.vector(1, 0, 0))
+  end
+
+  # Scenario: The normal on a sphere at a point on the y axis
+  #   Given s ← sphere()
+  #   When n ← normal_at(s, point(0, 1, 0))
+  #   Then n = vector(0, 1, 0)
+  it "the normal on a sphere at a point on the y axis" do
+    s = RayTracer::Sphere.new
+    n = s.normal_at(RayTracer::Tuple.point(0, 1, 0))
+    n.should eq(RayTracer::Tuple.vector(0, 1, 0))
+  end
+
+  # Scenario: The normal on a sphere at a point on the z axis
+  #   Given s ← sphere()
+  #   When n ← normal_at(s, point(0, 0, 1))
+  #   Then n = vector(0, 0, 1)
+  it "the normal on a sphere at a point on the z axis" do
+    s = RayTracer::Sphere.new
+    n = s.normal_at(RayTracer::Tuple.point(0, 0, 1))
+    n.should eq(RayTracer::Tuple.vector(0, 0, 1))
+  end
+
+  # Scenario: The normal on a sphere at a nonaxial point
+  #   Given s ← sphere()
+  #   When n ← normal_at(s, point(√3/3, √3/3, √3/3))
+  #   Then n = vector(√3/3, √3/3, √3/3)
+  it "the normal on a sphere at a nonaxial point" do
+    s = RayTracer::Sphere.new
+    sq3 = Math.sqrt(3) / 3
+    n = s.normal_at(RayTracer::Tuple.point(sq3, sq3, sq3))
+    n.should eq(RayTracer::Tuple.vector(sq3, sq3, sq3))
+  end
+
+  # Scenario: The normal is a normalized vector
+  #   Given s ← sphere()
+  #   When n ← normal_at(s, point(√3/3, √3/3, √3/3))
+  #   Then n = normalize(n)
+  it "the normal is a normalized vector" do
+    s = RayTracer::Sphere.new
+    sq3 = Math.sqrt(3) / 3
+    n = s.normal_at(RayTracer::Tuple.point(sq3, sq3, sq3))
+    n.should eq(n.normalize)
+  end
+
+  # Scenario: Computing the normal on a translated sphere
+  #   Given s ← sphere()
+  #     And set_transform(s, translation(0, 1, 0))
+  #   When n ← normal_at(s, point(0, 1.70711, -0.70711))
+  #   Then n = vector(0, 0.70711, -0.70711)
+  it "computing the normal on a translated sphere" do
+    s = RayTracer::Sphere.new
+    s.transform = RayTracer::Matrix.translation(0, 1, 0)
+    n = s.normal_at(RayTracer::Tuple.point(0, 1.70711, -0.70711))
+    n.should be_close(RayTracer::Tuple.vector(0, 0.70711, -0.70711), Spec::DELTA)
+  end
+
+  # Scenario: Computing the normal on a transformed sphere
+  #   Given s ← sphere()
+  #     And m ← scaling(1, 0.5, 1) * rotation_z(π/5)
+  #     And set_transform(s, m)
+  #   When n ← normal_at(s, point(0, √2/2, -√2/2))
+  #   Then n = vector(0, 0.97014, -0.24254)
+  it "computing the normal on a translated sphere" do
+    s = RayTracer::Sphere.new
+    s.transform = RayTracer::Matrix.scaling(1, 0.5, 1) * RayTracer::Matrix.rotation_z(Math::PI / 5)
+    sq2 = Math.sqrt(2) / 2
+    n = s.normal_at(RayTracer::Tuple.point(0, sq2, -sq2))
+    n.should be_close(RayTracer::Tuple.vector(0, 0.97014, -0.24254), Spec::DELTA)
+  end
+
+  # Scenario: A sphere has a default material
+  #   Given s ← sphere()
+  #   When m ← s.material
+  #   Then m = material()
+  it "a sphere has a default material" do
+    s = RayTracer::Sphere.new
+    m = s.material
+    m.should eq(RayTracer::Material.new)
+  end
+
+  # Scenario: A sphere may be assigned a material
+  #   Given s ← sphere()
+  #     And m ← material()
+  #     And m.ambient ← 1
+  #   When s.material ← m
+  #   Then s.material = m
+  it "a sphere may be assigned a material" do
+    s = RayTracer::Sphere.new
+    m = RayTracer::Material.new
+    m.ambient = 1
+    s.material = m
+    s.material.should eq(m)
+  end
 end

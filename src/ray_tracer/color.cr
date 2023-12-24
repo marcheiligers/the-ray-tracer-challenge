@@ -5,7 +5,7 @@ module RayTracer
     alias COLOR = NamedTuple(r: Float32, g: Float32, b: Float32)
 
     BLACK = color(0, 0, 0)
-    WHITE = color(255, 255, 255)
+    WHITE = color(1, 1, 1)
 
     def color(r : Float32, g : Float32, b : Float32)
       {r: r, g: g, b: b}

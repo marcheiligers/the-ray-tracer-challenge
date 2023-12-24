@@ -2,6 +2,8 @@ require "spec"
 require "../src/requires"
 
 module Spec
+  DELTA = 0.00009
+
   struct MatrixCloseExpectation
     def initialize(@expected_value : RayTracer::Matrix, @delta : Float64)
     end

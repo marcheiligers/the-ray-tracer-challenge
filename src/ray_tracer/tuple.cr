@@ -67,6 +67,10 @@ module RayTracer
       vector(a1[:y] * a2[:z] - a1[:z] * a2[:y], a1[:z] * a2[:x] - a1[:x] * a2[:z], a1[:x] * a2[:y] - a1[:y] * a2[:x])
     end
 
+    def reflect(v : TUPLE, n : TUPLE)
+      v - n * 2_f64 * dot(v, n)
+    end
+
     struct ::NamedTuple
       include RayTracer::Tuple
 
@@ -142,6 +146,10 @@ module RayTracer
       def cross(other : TUPLE)
         raise "Don't know how to cross #{typeof(self)} and #{typeof(other)}" unless typeof(self) == TUPLE
         cross(self, other)
+      end
+
+      def reflect(normal : TUPLE)
+        reflect(self, normal)
       end
     end
   end
