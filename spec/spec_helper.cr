@@ -48,6 +48,27 @@ module Spec
     end
   end
 
+  struct ColorCloseExpectation
+    def initialize(@expected_value : RayTracer::Color::COLOR, @delta : Float32)
+    end
+
+    def match(actual_value)
+      @expected_value.values.zip(actual_value.values) do |(e, a)|
+        return false unless (e - a).abs <= @delta
+      end
+
+      true
+    end
+
+    def failure_message(actual_value)
+      "Expected #{actual_value.pretty_inspect} to be within #{@delta} of #{@expected_value.pretty_inspect}"
+    end
+
+    def negative_failure_message(actual_value)
+      "Expected #{actual_value.pretty_inspect} not to be within #{@delta} of #{@expected_value.pretty_inspect}"
+    end
+  end
+
   module Expectations
     # Creates an `Expectation` that passes if actual is within *delta* of *expected*.
     def be_close(expected : RayTracer::Matrix, delta)

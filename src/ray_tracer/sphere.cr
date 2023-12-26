@@ -27,5 +27,9 @@ module RayTracer
       world_normal = transpose_inverse_transform * object_normal
       vector(world_normal.x, world_normal.y, world_normal.z).normalize
     end
+
+    def ==(other)
+      transform == other.transform && material == other.material
+    end
   end
 end

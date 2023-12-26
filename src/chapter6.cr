@@ -12,7 +12,7 @@ module Chapter6
     ray_origin = point(0, 0, -5)
     wall_z = 10
     wall_size = 7.0
-    canvas_pixels = 480_u32
+    canvas_pixels = 960_u32
     pixel_size = wall_size / canvas_pixels
     half = wall_size / 2
 
@@ -27,7 +27,7 @@ module Chapter6
     # shape.transform = Matrix.scaling(1, 0.5, 1) # shrink it along the y axis
     # shape.transform = Matrix.scaling(0.5, 1, 1) # shrink it along the x axis
     # shape.transform = Matrix.rotation_z(Math::PI / 4) * Matrix.scaling(0.5, 1, 1) # shrink it, and rotate it!
-    shape.transform = Matrix.shearing(1, 0, 0, 0, 0, 0) * Matrix.scaling(0.5, 1, 1) # shrink it, and skew it!
+    # shape.transform = Matrix.shearing(1, 0, 0, 0, 0, 0) * Matrix.scaling(0.5, 1, 1) # shrink it, and skew it!
 
     canvas_pixels.times do |y|
       world_y = half - pixel_size * y

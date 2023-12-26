@@ -26,7 +26,8 @@ module RayTracer
       # find the direction to the light source
       lightv = normalize(light.position - point) # compute the ambient contribution
       ambient = effective_color * self.ambient
-      # light_dot_normal represents the cosine of the angle between the # light vector and the normal vector. A negative number means the
+      # light_dot_normal represents the cosine of the angle between the
+      # light vector and the normal vector. A negative number means the
       # light is on the other side of the surface.
       light_dot_normal = dot(lightv, normalv)
       if light_dot_normal < 0

@@ -1,5 +1,8 @@
 module RayTracer
   class Matrix
+    include Tuple
+    extend Tuple
+
     @vals : Array(Array(Float64))
 
     def self.identity(size)
@@ -40,7 +43,7 @@ module RayTracer
     def self.rotation_x(r)
       new([
         [1_f64, 0_f64, 0_f64, 0_f64],
-        [0_f64, Math.cos(r), Math.sin(-r), 0_f64],
+        [0_f64, Math.cos(r), -Math.sin(r), 0_f64],
         [0_f64, Math.sin(r), Math.cos(r), 0_f64],
         [0_f64, 0_f64, 0_f64, 1_f64],
       ])
@@ -50,7 +53,7 @@ module RayTracer
       new([
         [Math.cos(r), 0_f64, Math.sin(r), 0_f64],
         [0_f64, 1_f64, 0_f64, 0_f64],
-        [Math.sin(r), 0_f64, Math.cos(r), 0_f64],
+        [-Math.sin(r), 0_f64, Math.cos(r), 0_f64],
         [0_f64, 0_f64, 0_f64, 1_f64],
       ])
     end
@@ -71,6 +74,24 @@ module RayTracer
         [z_x.to_f64, z_y.to_f64, 1_f64, 0_f64],
         [0_f64, 0_f64, 0_f64, 1_f64],
       ])
+    end
+
+    def self.view_transform(from : TUPLE, to : TUPLE, up : TUPLE)
+      raise "from should be a Point" unless point?(from)
+      raise "to should be a Point" unless point?(to)
+      raise "up should be a Vector" unless vector?(up)
+
+      forward = normalize(to - from)
+      upn = normalize(up)
+      left = cross(forward, upn)
+      true_up = cross(left, forward)
+      orientation = Matrix.new([
+        [left.x, left.y, left.z, 0_f64],
+        [true_up.x, true_up.y, true_up.z, 0_f64],
+        [-forward.x, -forward.y, -forward.z, 0_f64],
+        [0_f64, 0_f64, 0_f64, 1_f64],
+      ])
+      orientation * translation(-from.x, -from.y, -from.z)
     end
 
     def initialize(vals : Array(Array(Float64) | Array(Int32)))
