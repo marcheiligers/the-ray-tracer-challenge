@@ -3,29 +3,41 @@ module RayTracer
     include Color
     include Tuple
 
-    property(color : COLOR) { WHITE }
-    property(ambient : Float32) { 0.1_f32 }
-    property(diffuse : Float32) { 0.9_f32 }
-    property(specular : Float32) { 0.9_f32 }
-    property(shininess : Float32) { 200.0_f32 }
+    property(pattern : Pattern)
+    property(ambient : Float32)
+    property(diffuse : Float32)
+    property(specular : Float32)
+    property(shininess : Float32)
 
-    def initialize
+    def initialize(@pattern : Pattern = SolidPattern.new(WHITE), @ambient = 0.1_f32, @diffuse = 0.9_f32, @specular = 0.9_f32, @shininess = 200.0_f32)
     end
 
     def ==(other)
-      color == other.color &&
-        ambient == other.ambient &&
+      ambient == other.ambient &&
         diffuse == other.diffuse &&
         specular == other.specular &&
-        shininess == other.shininess
+        shininess == other.shininess &&
+        pattern == other.pattern
     end
 
-    def lighting(light, point, eyev, normalv)
+    def dup(deep = false)
+      material = Material.new
+      material.ambient = ambient
+      material.diffuse = diffuse
+      material.specular = specular
+      material.shininess = shininess
+      material.pattern = deep ? pattern : pattern.dup
+      material
+    end
+
+    def lighting(object, light, point, eyev, normalv, in_shadow = false)
       # combine the surface color with the light's color/intensity
-      effective_color = self.color * light.intensity
+      effective_color = pattern.pattern_at_shape(object, point) * light.intensity
       # find the direction to the light source
       lightv = normalize(light.position - point) # compute the ambient contribution
       ambient = effective_color * self.ambient
+      return ambient if in_shadow
+
       # light_dot_normal represents the cosine of the angle between the
       # light vector and the normal vector. A negative number means the
       # light is on the other side of the surface.
@@ -50,8 +62,9 @@ module RayTracer
           specular = light.intensity * self.specular * factor
         end
       end
+
       # Add the three contributions together to get the final shading
-      return ambient + diffuse + specular
+      ambient + diffuse + specular
     end
   end
 end

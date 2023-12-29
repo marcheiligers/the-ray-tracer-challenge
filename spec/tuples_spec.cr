@@ -328,6 +328,6 @@ describe RayTracer::Tuple do
     sq2 = Math.sqrt(2) / 2
     n = RayTracer::Tuple.vector(sq2, sq2, 0)
     r = v.reflect(n)
-    r.should be_close(RayTracer::Tuple.vector(1, 0, 0), Spec::DELTA)
+    r.should be_close(RayTracer::Tuple.vector(1, 0, 0), RayTracer::EPSILON)
   end
 end

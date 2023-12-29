@@ -21,6 +21,82 @@ describe RayTracer::Sphere do
     s.transform.should eq(t)
   end
 
+  # Scenario: A ray intersects a sphere at two points
+  # Given r ← ray(point(0, 0, -5), vector(0, 0, 1))
+  # And s ← sphere()
+  # When xs ← intersect(s, r)
+  # Then xs.count = 2
+  # And xs[0] = 4.0
+  # And xs[1] = 6.0
+  it "a ray intersects a sphere at two points" do
+    r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 0, -5), RayTracer::Tuple.vector(0, 0, 1))
+    s = RayTracer::Sphere.new
+    xs = s.intersect(r)
+    xs.size.should eq(2)
+    xs[0].t.should eq(4.0)
+    xs[1].t.should eq(6.0)
+  end
+
+  # Scenario: A ray intersects a sphere at a tangent
+  # Given r ← ray(point(0, 1, -5), vector(0, 0, 1))
+  # And s ← sphere()
+  # When xs ← intersect(s, r)
+  # Then xs.count = 2
+  # And xs[0] = 5.0
+  # And xs[1] = 5.0
+  it "a ray intersects a sphere at a tangent" do
+    r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 1, -5), RayTracer::Tuple.vector(0, 0, 1))
+    s = RayTracer::Sphere.new
+    xs = s.intersect(r)
+    xs.size.should eq(2)
+    xs[0].t.should eq(5.0)
+    xs[1].t.should eq(5.0)
+  end
+
+  # Scenario: A ray misses a sphere
+  # Given r ← ray(point(0, 2, -5), vector(0, 0, 1))
+  # And s ← sphere()
+  # When xs ← intersect(s, r)
+  # Then xs.count = 0
+  it "a ray misses a sphere" do
+    r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 2, -5), RayTracer::Tuple.vector(0, 0, 1))
+    s = RayTracer::Sphere.new
+    xs = s.intersect(r)
+    xs.size.should eq(0)
+  end
+
+  # Scenario: A ray originates inside a sphere
+  # Given r ← ray(point(0, 0, 0), vector(0, 0, 1))
+  # And s ← sphere()
+  # When xs ← intersect(s, r)
+  # Then xs.count = 2
+  # And xs[0] = -1.0
+  # And xs[1] = 1.0
+  it "a ray originates inside a sphere" do
+    r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 0, 0), RayTracer::Tuple.vector(0, 0, 1))
+    s = RayTracer::Sphere.new
+    xs = s.intersect(r)
+    xs.size.should eq(2)
+    xs[0].t.should eq(-1.0)
+    xs[1].t.should eq(1.0)
+  end
+
+  # Scenario: A sphere is behind a ray
+  # Given r ← ray(point(0, 0, 5), vector(0, 0, 1))
+  # And s ← sphere()
+  # When xs ← intersect(s, r)
+  # Then xs.count = 2
+  # And xs[0] = -6.0
+  # And xs[1] = -4.0
+  it "a sphere is behind a ray" do
+    r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 0, 5), RayTracer::Tuple.vector(0, 0, 1))
+    s = RayTracer::Sphere.new
+    xs = s.intersect(r)
+    xs.size.should eq(2)
+    xs[0].t.should eq(-6.0)
+    xs[1].t.should eq(-4.0)
+  end
+
   # Scenario: Intersecting a scaled sphere with a ray
   # Given r ← ray(point(0, 0, -5), vector(0, 0, 1))
   # And s ← sphere()
@@ -33,10 +109,26 @@ describe RayTracer::Sphere do
     r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 0, -5), RayTracer::Tuple.vector(0, 0, 1))
     s = RayTracer::Sphere.new
     s.transform = RayTracer::Matrix.scaling(2, 2, 2)
-    xs = r.intersects(s)
+    xs = s.intersect(r)
     xs.size.should eq(2)
     xs[0].t.should eq(3)
     xs[1].t.should eq(7)
+  end
+
+  # Scenario: Intersect sets the object on the intersection
+  # Given r ← ray(point(0, 0, -5), vector(0, 0, 1))
+  # And s ← sphere()
+  # When xs ← intersect(s, r)
+  # Then xs.count = 2
+  # And xs[0].object = s
+  # And xs[1].object = s
+  it "intersect sets the object on the intersection" do
+    r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 0, -5), RayTracer::Tuple.vector(0, 0, 1))
+    s = RayTracer::Sphere.new
+    xs = s.intersect(r)
+    xs.size.should eq(2)
+    xs[0].object.should eq(s)
+    xs[1].object.should eq(s)
   end
 
   # Scenario: Intersecting a translated sphere with a ray
@@ -49,7 +141,7 @@ describe RayTracer::Sphere do
     r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 0, -5), RayTracer::Tuple.vector(0, 0, 1))
     s = RayTracer::Sphere.new
     s.transform = RayTracer::Matrix.translation(5, 0, 0)
-    xs = r.intersects(s)
+    xs = s.intersect(r)
     xs.size.should eq(0)
   end
 
@@ -114,7 +206,7 @@ describe RayTracer::Sphere do
     s = RayTracer::Sphere.new
     s.transform = RayTracer::Matrix.translation(0, 1, 0)
     n = s.normal_at(RayTracer::Tuple.point(0, 1.70711, -0.70711))
-    n.should be_close(RayTracer::Tuple.vector(0, 0.70711, -0.70711), Spec::DELTA)
+    n.should be_close(RayTracer::Tuple.vector(0, 0.70711, -0.70711), RayTracer::EPSILON)
   end
 
   # Scenario: Computing the normal on a transformed sphere
@@ -128,7 +220,7 @@ describe RayTracer::Sphere do
     s.transform = RayTracer::Matrix.scaling(1, 0.5, 1) * RayTracer::Matrix.rotation_z(Math::PI / 5)
     sq2 = Math.sqrt(2) / 2
     n = s.normal_at(RayTracer::Tuple.point(0, sq2, -sq2))
-    n.should be_close(RayTracer::Tuple.vector(0, 0.97014, -0.24254), Spec::DELTA)
+    n.should be_close(RayTracer::Tuple.vector(0, 0.97014, -0.24254), RayTracer::EPSILON)
   end
 
   # Scenario: A sphere has a default material

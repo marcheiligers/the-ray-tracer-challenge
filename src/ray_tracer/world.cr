@@ -1,35 +1,17 @@
 module RayTracer
+  EPSILON = 0.00001
+
   class World
     include Tuple
     extend Tuple
     extend Color
 
-    getter(objects : Array(Sphere)) { [] of Sphere }
+    getter(objects : Array(Shape)) { [] of Shape }
     property(light : PointLight) { PointLight::NIL }
-
-    def self.default
-      light = PointLight.new(point(-10, 10, -10), color(1, 1, 1))
-
-      material = Material.new
-      material.color = color(0.8, 1.0, 0.6)
-      material.diffuse = 0.7
-      material.specular = 0.2
-      s1 = Sphere.new
-      s1.material = material
-
-      transform = Matrix.scaling(0.5, 0.5, 0.5)
-      s2 = Sphere.new
-      s2.transform = transform
-
-      world = World.new
-      world.light = light
-      world.objects << s1 << s2
-      world
-    end
 
     def intersects(ray : Ray)
       intersections = Intersections.new
-      objects.each { |o| intersections.concat(ray.intersects(o)) }
+      objects.each { |o| intersections.concat(o.intersect(ray)) }
       intersections.sort_by!(&.t)
       intersections
     end
@@ -37,7 +19,7 @@ module RayTracer
     def shade_hit(comps : Computation)
       raise "No light" if light.nil?
 
-      comps.object.material.lighting(light, comps.point, comps.eyev, comps.normalv)
+      comps.object.material.lighting(comps.object, light, comps.over_point, comps.eyev, comps.normalv, shadowed?(comps.over_point))
     end
 
     def color_at(ray : Ray)
@@ -53,6 +35,18 @@ module RayTracer
           shade_hit(comps)
         end
       end
+    end
+
+    def shadowed?(point : TUPLE)
+      raise "Point should be a point" unless point.point?
+
+      v = light.position - point
+      distance = magnitude(v)
+      direction = normalize(v)
+      r = Ray.new(point, direction)
+      intersections = intersects(r)
+      h = intersections.hit
+      !h.nil? && h.t < distance
     end
   end
 end

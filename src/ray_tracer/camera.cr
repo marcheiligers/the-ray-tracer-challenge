@@ -44,10 +44,11 @@ module RayTracer
       Ray.new(origin, direction)
     end
 
-    def render(world : World)
+    def render(world : World, progress = false)
       image = Canvas.new(hsize, vsize)
       vsize.times do |y|
         hsize.times do |x|
+          print "\r#{y}/#{vsize}" if progress && y % 20 == 0
           ray = ray_for_pixel(x, y)
           color = world.color_at(ray)
           image.write_pixel(x, y, color)

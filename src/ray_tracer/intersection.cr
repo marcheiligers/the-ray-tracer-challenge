@@ -2,7 +2,7 @@ module RayTracer
   class Intersection
     getter :t, :object
 
-    def initialize(@t : Float64, @object : Sphere)
+    def initialize(@t : Float64, @object : Shape)
     end
   end
 end

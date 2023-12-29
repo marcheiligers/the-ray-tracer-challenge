@@ -1,35 +1,22 @@
 module RayTracer
-  class Sphere
-    include Tuple
-    @transform : Matrix
-    @inverse_transform : Matrix
-    @transpose_inverse_transform : Matrix
+  class Sphere < Shape
+    def local_intersect(ray : Ray) : Intersections
+      sphere_to_ray = ray.origin - ORIGIN
+      a = dot(ray.direction, ray.direction)
+      b = 2 * dot(ray.direction, sphere_to_ray)
+      c = dot(sphere_to_ray, sphere_to_ray) - 1
+      discriminant = b * b - 4 * a * c
 
-    getter :transform, :inverse_transform, :transpose_inverse_transform
+      return Intersections.new if discriminant < 0
 
-    property(material) { Material.new }
-
-    def initialize
-      @transform = Matrix::IDENTITY_4
-      @inverse_transform = Matrix::IDENTITY_4
-      @transpose_inverse_transform = @inverse_transform.transpose
+      Intersections.new(
+        Intersection.new((-b - Math.sqrt(discriminant)) / (2 * a), self),
+        Intersection.new((-b + Math.sqrt(discriminant)) / (2 * a), self),
+      )
     end
 
-    def transform=(val : Matrix)
-      @transform = val
-      @inverse_transform = val.inverse
-      @transpose_inverse_transform = @inverse_transform.transpose
-    end
-
-    def normal_at(world_point : TUPLE)
-      object_point = inverse_transform * world_point
-      object_normal = object_point - ORIGIN
-      world_normal = transpose_inverse_transform * object_normal
-      vector(world_normal.x, world_normal.y, world_normal.z).normalize
-    end
-
-    def ==(other)
-      transform == other.transform && material == other.material
+    def local_normal_at(point : TUPLE)
+      point - ORIGIN
     end
   end
 end

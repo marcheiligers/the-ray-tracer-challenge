@@ -4,10 +4,11 @@ module RayTracer
     extend Tuple
 
     getter(t : Float64)
-    getter(object : Sphere)
+    getter(object : Shape)
     getter(point : TUPLE)
     getter(eyev : TUPLE)
     getter(normalv : TUPLE)
+    getter(over_point : TUPLE)
 
     def initialize(intersection : Intersection, ray : Ray)
       @t = intersection.t
@@ -23,6 +24,8 @@ module RayTracer
       else
         @inside = false
       end
+
+      @over_point = point + normalv * EPSILON
     end
 
     def inside?

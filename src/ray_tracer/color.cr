@@ -11,6 +11,10 @@ module RayTracer
       {r: r, g: g, b: b}
     end
 
+    def color(h : Int32)
+      {r: ((h & 0xFF0000) >> 16) / 255_f32, g: ((h & 0x00FF00) >> 8) / 255_f32, b: (h & 0x0000FF) / 255_f32}
+    end
+
     def add(c1 : COLOR, c2 : COLOR)
       {r: c1.r + c2.r, g: c1.g + c2.g, b: c1.b + c2.b}
     end
@@ -25,6 +29,10 @@ module RayTracer
 
     def multiply(c1 : COLOR, c2 : COLOR)
       {r: c1.r * c2.r, g: c1.g * c2.g, b: c1.b * c2.b}
+    end
+
+    def divide(c : COLOR, s : Float32)
+      {r: c.r / s, g: c.g / s, b: c.b / s}
     end
 
     def abs(c : COLOR) # magnitude, but used in be_close in tests
@@ -67,6 +75,11 @@ module RayTracer
       def *(other : COLOR)
         raise "Don't know how to multiply #{typeof(self)} and #{typeof(other)}" unless typeof(self) == COLOR
         multiply(self, other)
+      end
+
+      def /(scalar : Float32)
+        raise "Don't know how to divide #{typeof(self)} with a scalar" unless typeof(self) == COLOR
+        divide(self, scalar)
       end
 
       def abs

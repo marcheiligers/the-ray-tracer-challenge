@@ -111,8 +111,8 @@ describe RayTracer::Intersection do
   #     And comps.normalv = vector(0, 0, -1)
   it "precomputing the state of an intersection" do
     r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 0, -5), RayTracer::Tuple.vector(0, 0, 1))
-    s = RayTracer::Sphere.new
-    i = r.intersects(s).first
+    shape = RayTracer::Sphere.new
+    i = RayTracer::Intersection.new(4, shape)
     comps = RayTracer::Computation.new(i, r)
     comps.t.should eq(i.t)
     comps.object.should eq(i.object)
@@ -129,8 +129,8 @@ describe RayTracer::Intersection do
   #   Then comps.inside = false
   it "the hit, when an intersection occurs on the outside" do
     r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 0, -5), RayTracer::Tuple.vector(0, 0, 1))
-    s = RayTracer::Sphere.new
-    i = r.intersects(s).first
+    shape = RayTracer::Sphere.new
+    i = RayTracer::Intersection.new(4, shape)
     comps = RayTracer::Computation.new(i, r)
     comps.inside?.should be_false
   end
@@ -147,12 +147,32 @@ describe RayTracer::Intersection do
   #     And comps.normalv = vector(0, 0, -1)
   it "the hit, when an intersection occurs on the inside" do
     r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 0, 0), RayTracer::Tuple.vector(0, 0, 1))
-    s = RayTracer::Sphere.new
-    i = r.intersects(s).last
+    shape = RayTracer::Sphere.new
+    i = RayTracer::Intersection.new(1, shape)
     comps = RayTracer::Computation.new(i, r)
     comps.point.should eq(RayTracer::Tuple.point(0, 0, 1))
     comps.eyev.should eq(RayTracer::Tuple.vector(0, 0, -1))
     comps.inside?.should be_true
     comps.normalv.should eq(RayTracer::Tuple.vector(0, 0, -1))
+  end
+
+  # Scenario: The hit should offset the point
+  #   Given r ← ray(point(0, 0, -5), vector(0, 0, 1))
+  #     And shape ← sphere() with:
+  #       | transform | translation(0, 0, 1) |
+  #     And i ← intersection(5, shape)
+  #   When comps ← prepare_computations(i, r)
+  #   Then comps.over_point.z < -EPSILON/2
+  #     And comps.point.z > comps.over_point.z
+  it "the hit should offset the point" do
+    r = RayTracer::Ray.new(RayTracer::Tuple.point(0, 0, -5), RayTracer::Tuple.vector(0, 0, 1))
+    shape = RayTracer::Sphere.new
+    transform = RayTracer::Matrix.translation(0, 0, 1)
+    shape.transform = transform
+    i = RayTracer::Intersection.new(5, shape)
+
+    comps = RayTracer::Computation.new(i, r)
+    (comps.over_point.z < -RayTracer::EPSILON/2).should be_true
+    (comps.point.z > comps.over_point.z).should be_true
   end
 end
